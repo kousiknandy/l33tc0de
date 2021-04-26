@@ -1,0 +1,68 @@
+An Algorithm for MAC Randomization Enabling Device Identification
+
+The motivation of MAC randomization is well understood. Where it provides
+security to the devices, it poses a big challenge to the controllers which is
+collecting telemetry information, as there is no way for the controller to
+reconcile the MAC addresses and account the data to the same device.
+
+Below we propose an MAC generation algorithm which are random enough for someone
+listening to the network traffic to predict or derive the device identity, but
+easy for the controller to uniquely identify the device from the MAC address.
+The algorithm does not require any change in any higher level protocol or any
+change in packet headers/payload.
+
+What we propose is a (currently hypothetical) function f, which if run on a
+given MAC, will produce a device id. The function will take some fixed
+parameters and the device MAC as input, and produce a mapping from the device
+MAC to a device id. The device and the controller shares a secret key, which is
+used as an input to the algorithm. The device generates a (pseudo) random MAC
+address using the secret key, optionally a vendor prefix so that the generated
+MAC can be used by the controller, alongwith the secret key, to derive the
+unique device id.
+
+
+
+Rejected due to a fatal flaw --.
+____________________________    \ |
+                               __\|
+			       
+"S" is a shared secret between the controller and device, configured to device
+during onboarding, "V" is a vendor prefix that used as a prefix of randomized
+address, and device_id is an unique id assigned to the device, again configured
+by controller during onboarding.
+
+Device algorithm: choose a random "M" so that f("S" + "V" + "M") == device_id
+publish "V" + "M" as MAC address ("MAC"). 
+
+Controller algorithm: compute f("S" + "MAC") as the device_id.
+
+Workflow:
+
+Device                                   Controller
+        -------------- fsol ------------>
+	<----------- S, device_id -------
+ compute M
+ so that
+ f(S+V+M) = device_id
+        ------- use MAC = V+M ---------->
+                                  device_id = f(S+V+M)
+
+Properties of f(): f is a special kind of hash function that has the following
+properties: (1) the function is deterministic i.e produces the same output for
+the same input, (2) it is pre-image resistant i.e looking at the hash value it
+is hard to determine the input, (3) it is NOT second pre-image resistant, i.e
+given an input and the hash it is not hard to compute a second input that has
+the same hash, (4) it is NOT collision resistant, which is, it should be
+possible to find multiple inputs that maps to the same hash. The f() is
+different from conventional cryptographic hashes on properties (3) and (4).
+Because of this property, the device can find multiple values of M that results
+in a collision of f(S+V+M), and the controller uses the collision to map the MAC
+to an unique device id. Since M is randomly chosen, it is not possible for any
+external entity to predict the next MAC to be used by a device. And without the
+knowledge of S, it is not possible for someone to compute f() and map the MAC to
+a device_id.
+
+Implementation of f(): hash functions that have strong avalanche effect but
+output truncated to produce enough collisions will solve the purpose. We are
+demonstrating with DJB's hash in the accompanying code, but other hash functions
+can serve equally well.
