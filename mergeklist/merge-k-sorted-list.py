@@ -12,15 +12,11 @@ class Solution:
 
     def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
         if len(lists) == 0: return None
+        lists = filter(None, lists)
         gl = [self.getnext(l,i) for i,l in enumerate(lists)]
-        el =[]
-        for l in gl: 
-            try:
-                el.append(next(l))
-            except StopIteration:
-                pass
-        heapq.heapify(el)
+        el = [next(l) for l in gl]
         res = tail = None
+        heapq.heapify(el)
         while len(el):
             v, i = heapq.heappop(el)
             n = ListNode(v)
@@ -28,7 +24,7 @@ class Solution:
             if tail: tail.next = n
             tail = n
             try:
-                v, i = next(gl[i])
+                v, i = next(gl[i]) # replenish
                 heapq.heappush(el, (v, i))
             except StopIteration:
                 pass
