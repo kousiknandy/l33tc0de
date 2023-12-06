@@ -1,17 +1,6 @@
 class Solution {
     bool vowel(char c) {
-        std::unordered_map<char, bool> vowels = {
-            {'a', true},
-            {'A', true},
-            {'e', true},
-            {'E', true},
-            {'i', true},
-            {'I', true},
-            {'o', true},
-            {'O', true},
-            {'u', true},
-            {'U', true}
-        };
+        std::unordered_set<char> vowels = {'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U'};
         return vowels.contains(c);
     }
 
