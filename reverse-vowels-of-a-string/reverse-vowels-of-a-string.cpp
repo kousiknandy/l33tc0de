@@ -1,7 +1,18 @@
 class Solution {
     bool vowel(char c) {
-        string vowels = "aAeEiIoOuU";
-        return (vowels.find(c) != string::npos);
+        std::unordered_map<char, bool> vowels = {
+            {'a', true},
+            {'A', true},
+            {'e', true},
+            {'E', true},
+            {'i', true},
+            {'I', true},
+            {'o', true},
+            {'O', true},
+            {'u', true},
+            {'U', true}
+        };
+        return vowels.contains(c);
     }
 
 public:
