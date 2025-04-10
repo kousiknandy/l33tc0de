@@ -4,20 +4,22 @@ class Solution:
             while x != parents[x]:
                 x = parents[x] = parents[parents[x]]
             return x
+        
+        def union(parents, sizes, x, y):
+            r1 = find(parents, x)
+            r2 = find(parents, y)
+            if r1 == r2: return 
+            if sizes[r1] <= sizes[r2]: r1, r2 = r2, r1
+            parents[r2] = r1
+            sizes[r1] += sizes[r2]
+            sizes[r2] = 0
+            
 
-        def union(parents, x, y, sets):
-            r1 = find(parents,x)
-            r2 = find(parents,y)
-            if r1 == r2: return sets
-            if r1 < r2: parents[r2] = r1
-            else: parents[r1] = r2
-            return max(1, sets-1)
-
-        sets = n = len(isConnected[0])
-        parents = [x for x in range(sets)]
+        n = sets = len(isConnected[0])
+        parents = [x for x in range(n)]
+        sizes = [1] * n
         for i in range(n):
             for j in range(i+1, n):
-                # print(i,j, "*" if isConnected[i][j] else "")
                 if isConnected[i][j]:
-                    sets = union(parents,i,j,sets)
-        return sets
+                    union(parents,sizes,i,j)
+        return len([x for x in sizes if x])
