@@ -6,29 +6,28 @@ class Trie:
     def __init__(self):
         self.root = {}
 
-    def insert(self, word: str) -> None:
+    def traverse(self, word, create, prefix):
         level = self.root
         for c in word:
             if c not in level:
-                level[c] = {}
+                if create:
+                    level[c] = {}
+                else:
+                    return False
             level = level[c]
-        level[None] = None
+        if create:
+            level[None] = None
+            return
+        return prefix or (None in level)
+
+    def insert(self, word: str) -> None:
+        return self.traverse(word, True, False)
 
     def search(self, word: str) -> bool:
-        level = self.root
-        for c in word:
-            if c not in level:
-                return False
-            level = level[c]
-        return None in level
+        return self.traverse(word, False, False)
 
     def startsWith(self, prefix: str) -> bool:
-        level = self.root
-        for c in prefix:
-            if c not in level:
-                return False
-            level = level[c]
-        return True
+        return self.traverse(prefix, False, True)
 
 
 # Your Trie object will be instantiated and called as such:
